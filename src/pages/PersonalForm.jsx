@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { PropTypes } from 'prop-types';
 
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Select from '../components/Select';
+import personalAction from '../Redux/store/actions/PersonalAction';
 
 class PersonalForm extends Component {
   constructor() {
@@ -24,6 +27,13 @@ class PersonalForm extends Component {
     const { name, value } = target;
     this.setState({ [name]: value });
   }
+
+  dispatchData = () => {
+    const { name, email, cpf, address, city, uf } = this.state;
+    const { changePersonal, history } = this.props;
+    changePersonal({ name, email, cpf, address, city, uf });
+    history.push('/professionalform');
+  };
 
   render() {
     const { name, email, cpf, address, city, uf } = this.state;
@@ -84,11 +94,28 @@ class PersonalForm extends Component {
         <Button
           type="button"
           label="Enviar"
-          onClick={ () => console.log('Ao clicar, envie a informação do formulário') }
+          onClick={ this.dispatchData }
         />
       </fieldset>
     );
   }
 }
 
-export default PersonalForm;
+const mapStateToProps = (state) => ({
+  personal: state.myReducer.statePersonal,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  changePersonal: (state) => {
+    dispatch(personalAction(state));
+  },
+});
+
+PersonalForm.propTypes = {
+  changePersonal: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PersonalForm);
